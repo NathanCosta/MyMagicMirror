@@ -27,12 +27,15 @@ GPIO.setup(SWITCH_ONE_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 strip = Adafruit_NeoPixel(LED_COUNT, LED_STRIP_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
 strip.begin()
 
+stripThread = LEDStripThread(strip, LED_COUNT, MAX_INTENSITY)
+
 def handleSwitchOne():
-	stripThread = LEDStripThread(strip, LED_COUNT, MAX_INTENSITY)
-	stripThread.turnOnLEDs()
+	stripThread.toggleLEDs()
 	time.sleep(5)
 
 if __name__ == '__main__':
+	stripThread.toggleLEDs()
+	
 	while True:
 		if(GPIO.input(SWITCH_ONE_PIN)):
 			handleSwitchOne()
