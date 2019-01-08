@@ -44,21 +44,16 @@ class LEDStripController():
 		self.currentThread.start()
 
 	def turnOnLEDs(self):
-		print("turnOnLEDs")
-		print("self.ledsOn")
 		self.ledsOn = True
 		self.togglingLeds = True
 		self.setAllLEDs(self.maxIntensity)
 		self.togglingLeds = False
-		print("turnOnLEDsEND")
 
 	def turnOffLEDs(self):
-		print("turnOffLEDs")
 		self.ledsOn = False
 		self.togglingLeds = True
 		self.setAllLEDs(0)
 		self.togglingLeds = False
-		print("turnOffLEDsEND")
 
 	def setAllLEDs(self, finalValue):
 		initialValues = copy.deepcopy(self.ledValues)
