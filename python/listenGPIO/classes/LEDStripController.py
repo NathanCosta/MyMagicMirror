@@ -1,16 +1,16 @@
 import time
 import StoppableThread
 import copy
+import threading
 from neopixel import *
 
-class LEDStripThread(StoppableThread.StoppableThread):
+class LEDStripController():
 
 	TRANSITION_STEPS = 100 #how many steps needed to get the LEDs to their final value
 	TRANSITION_TIME = 2	#the amount of seconds to get the LEDs to their final value
 	TRANSITION_STEP_TIME = TRANSITION_TIME / float(TRANSITION_STEPS) #this is what's actually being used to decide the total time used
 
 	def __init__(self, strip, ledCount, maxIntensity=255):
-		super(LEDStripThread, self).__init__()
 		self.strip = strip
 		self.maxIntensity = maxIntensity
 		self.ledCount = ledCount
@@ -19,24 +19,46 @@ class LEDStripThread(StoppableThread.StoppableThread):
 		self.ledsOn = False
 		self.ledValues = self.getLEDInitialVal()
 
+		self.interruptToggle = False
+
+	def run(self):
+		self.clear()
+		self.action()
+		self.clear()
+
 	def toggleLEDs(self):
-		if not self.togglingLeds:
-			if self.ledsOn:
-				self.turnOffLEDs()
-			else:
-				self.turnOnLEDs()
+
+		if hasattr(self, "currentThread") and self.currentThread.isAlive():
+			self.interruptToggle = True
+
+			while self.currentThread.isAlive():
+				time.sleep(0.05)
+
+			self.interruptToggle = False
+
+		if self.ledsOn:
+			self.currentThread = threading.Thread(target=self.turnOffLEDs)
+		else:
+			self.currentThread = threading.Thread(target=self.turnOnLEDs)
+
+		self.currentThread.start()
 
 	def turnOnLEDs(self):
+		print("turnOnLEDs")
+		print("self.ledsOn")
 		self.ledsOn = True
 		self.togglingLeds = True
 		self.setAllLEDs(self.maxIntensity)
 		self.togglingLeds = False
+		print("turnOnLEDsEND")
 
 	def turnOffLEDs(self):
+		print("turnOffLEDs")
 		self.ledsOn = False
 		self.togglingLeds = True
 		self.setAllLEDs(0)
 		self.togglingLeds = False
+		print("turnOffLEDsEND")
 
 	def setAllLEDs(self, finalValue):
 		initialValues = copy.deepcopy(self.ledValues)
@@ -53,9 +75,21 @@ class LEDStripThread(StoppableThread.StoppableThread):
 
 			self.strip.show()
 
+			if self.interruptToggle:
+				break
+
 			#going to need to take into consideration the run time so that we can get as close to TRANSITION_TIME as possible
 			sleepTime = self.TRANSITION_STEP_TIME - (time.time() - startTime)
 			time.sleep(sleepTime if sleepTime > 0 else 0)
+
+	def resetAll(self):
+		for led in range(self.ledCount):
+			self.ledValues[led][0] = 0
+			self.ledValues[led][1] = 0
+			self.ledValues[led][2] = 0
+			self.strip.setPixelColor(led, Color(0,0,0))
+
+		self.strip.show()
 
 	def setLEDValue(self, led, r, g, b):
 		self.ledValues[led][0] = r

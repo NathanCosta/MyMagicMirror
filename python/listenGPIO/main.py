@@ -3,7 +3,7 @@
 import time
 from neopixel import *
 import RPi.GPIO as GPIO
-from classes.LEDStripThread import LEDStripThread
+from classes.LEDStripController import LEDStripController
 
 # LED strip configuration:
 LED_COUNT      = 112      # Number of LED pixels.
@@ -17,28 +17,43 @@ MAX_INTENSITY  = 255
 #GPIO pin configuration
 LED_STRIP_PIN	= 18
 PIR_SENSOR_PIN	= 16
-SWITCH_ONE_PIN	= 12
-SWITCH_TWO_PIN	= 6
+BUTTON_ONE_PIN	= 12
+BUTTON_TWO_PIN	= 6
+
+#tunning response times (in seconds)
+BUTTON_DOWN_TIME = 0.5
+
+#tracking variables, nothing to see here, move along
+BUTTON_ONE_LAST = 0.0
+BUTTON_TWO_LAST = 0.0
 
 GPIO.setwarnings(True)
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(SWITCH_ONE_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+GPIO.setup(BUTTON_ONE_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
 strip = Adafruit_NeoPixel(LED_COUNT, LED_STRIP_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
 strip.begin()
 
-stripThread = LEDStripThread(strip, LED_COUNT, MAX_INTENSITY)
+stripController = LEDStripController(strip, LED_COUNT, MAX_INTENSITY)
 
-def handleSwitchOne():
-	stripThread.toggleLEDs()
-	time.sleep(5)
+def handleButtonOne():
+	global BUTTON_ONE_LAST
+	if time.time() - BUTTON_ONE_LAST > BUTTON_DOWN_TIME:
+		BUTTON_ONE_LAST = time.time()
+		stripController.toggleLEDs()
+
+def handleButtonTwo():
+	global BUTTON_TWO_LAST
+	if time.time() - BUTTON_TWO_LAST > BUTTON_DOWN_TIME:
+		BUTTON_TWO_LAST = time.time()
 
 if __name__ == '__main__':
-	stripThread.toggleLEDs()
+	stripController.resetAll()
+	stripController.toggleLEDs()
 	
 	while True:
-		if(GPIO.input(SWITCH_ONE_PIN)):
-			handleSwitchOne()
+		if(GPIO.input(BUTTON_ONE_PIN)):
+			handleButtonOne()
 
 		time.sleep(0.05)
 
