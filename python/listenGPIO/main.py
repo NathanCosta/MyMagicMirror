@@ -49,8 +49,7 @@ def handleButtonTwo():
 
 if __name__ == '__main__':
 	stripController.resetAll()
-	stripController.toggleLEDs()
-	
+
 	while True:
 		if(GPIO.input(BUTTON_ONE_PIN)):
 			handleButtonOne()
