@@ -3,8 +3,8 @@
 import time
 from neopixel import *
 import RPi.GPIO as GPIO
-from classes.LEDStripController import LEDStripController
-from classes.MonitorController import MonitorController
+from classes.LedStripController import LedStripController
+from classes.DisplayController import DisplayController
 
 # LED strip configuration:
 LED_COUNT      = 112     # Number of LED pixels.
@@ -33,37 +33,43 @@ GPIO.setmode(GPIO.BCM)
 
 GPIO.setup(BUTTON_ONE_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 GPIO.setup(BUTTON_TWO_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+GPIO.setup(PIR_SENSOR_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
 strip = Adafruit_NeoPixel(LED_COUNT, LED_STRIP_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
 strip.begin()
 
-ledStripController = LEDStripController(strip, LED_COUNT, MAX_INTENSITY)
-monitorController = MonitorController()
+ledStripController = LedStripController(strip, LED_COUNT, MAX_INTENSITY)
+displayController = DisplayController()
 
 def handleButtonOne():
 	global BUTTON_ONE_LAST
 	if time.time() - BUTTON_ONE_LAST > BUTTON_DOWN_TIME:
 		BUTTON_ONE_LAST = time.time()
 
-		ledStripController.toggleLEDs()
+		ledStripController.toggleLeds()
 
 def handleButtonTwo():
 	global BUTTON_TWO_LAST
 	if time.time() - BUTTON_TWO_LAST > BUTTON_DOWN_TIME:
 		BUTTON_TWO_LAST = time.time()
 
-		monitorController.toggleMonitor()
+		displayController.toggleDisplay()
+
+def handlePirSensor():
+	displayController.turnOnDisplay()
 
 if __name__ == '__main__':
 	ledStripController.resetAll()
 
 	while True:
+
 		if(GPIO.input(BUTTON_ONE_PIN)):
 			handleButtonOne()
 
 		if(GPIO.input(BUTTON_TWO_PIN)):
 			handleButtonTwo()
 
+		if(GPIO.input(PIR_SENSOR_PIN)):
+			handlePirSensor()
+
 		time.sleep(0.05)
-
-
