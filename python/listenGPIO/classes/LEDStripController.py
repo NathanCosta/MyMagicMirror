@@ -1,13 +1,12 @@
 import time
-import StoppableThread
 import copy
 import threading
 from neopixel import *
 
 class LEDStripController():
 
-	TRANSITION_STEPS = 100 #how many steps needed to get the LEDs to their final value
-	TRANSITION_TIME = 2	#the amount of seconds to get the LEDs to their final value
+	TRANSITION_STEPS = 50 #how many steps needed to get the LEDs to their final value
+	TRANSITION_TIME = 1	#the amount of seconds to get the LEDs to their final value
 	TRANSITION_STEP_TIME = TRANSITION_TIME / float(TRANSITION_STEPS) #this is what's actually being used to decide the total time used
 
 	def __init__(self, strip, ledCount, maxIntensity=255):
