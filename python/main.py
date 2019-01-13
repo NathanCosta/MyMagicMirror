@@ -31,9 +31,13 @@ UDP_PORT = 12123
 #tunning response times (in seconds)
 BUTTON_DOWN_TIME = 0.5
 
+#seconds to disable the PIR sensor when the display is shut off by the button
+PIR_SENSOR_TIMEOUT = 60
+
 #tracking variables, nothing to see here, move along
 BUTTON_ONE_LAST = 0.0
 BUTTON_TWO_LAST = 0.0
+PIR_SENSOR_DISABLED = False
 
 #used to interrupt the program
 RUN_PROGRAM = True
@@ -62,14 +66,30 @@ def handleButtonOne():
 		ledStripController.toggleLeds()
 
 def handleButtonTwo():
-	global BUTTON_TWO_LAST
+	global BUTTON_TWO_LAST, PIR_SENSOR_DISABLED
 	if time.time() - BUTTON_TWO_LAST > BUTTON_DOWN_TIME:
 		BUTTON_TWO_LAST = time.time()
 
-		displayController.toggleDisplay()
+		toggledTo = displayController.toggleDisplay()
+		if not toggledTo:
+			timeoutPirSensor()
+
+def timeoutPirSensor():
+	global PIR_SENSOR_DISABLED
+
+	if not PIR_SENSOR_DISABLED:
+		PIR_SENSOR_DISABLED = True
+		timer = threading.Timer(PIR_SENSOR_TIMEOUT, endPirSensorTimeout)
+		timer.daemon = True
+		timer.start()
+
+def endPirSensorTimeout():
+	global PIR_SENSOR_DISABLED
+	PIR_SENSOR_DISABLED = False
 
 def handlePirSensor():
-	displayController.turnOnDisplay()
+	if not PIR_SENSOR_DISABLED:
+		displayController.turnOnDisplay()
 
 def listenToUDP():
 	global RUN_PROGRAM

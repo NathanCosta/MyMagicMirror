@@ -9,11 +9,12 @@ class DisplayController():
 		self.updatePowerState()
 
 	def toggleDisplay(self):
-		self.setDisplayPower(not self.displayPower)
+		return self.setDisplayPower(not self.displayPower)
 
 	def setDisplayPower(self, powerState):
 		call(["vcgencmd", "display_power " + ("1" if powerState else "0")])
 		self.updatePowerState()
+		return self.displayPower
 
 	def updatePowerState(self):
 		response = check_output(["vcgencmd", "display_power"])
