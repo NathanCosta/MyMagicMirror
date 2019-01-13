@@ -27,13 +27,7 @@ class LedStripController():
 
 	def toggleLeds(self):
 
-		if hasattr(self, "currentThread") and self.currentThread.isAlive():
-			self.interruptToggle = True
-
-			while self.currentThread.isAlive():
-				time.sleep(0.05)
-
-			self.interruptToggle = False
+		self.stopThreads()
 
 		if self.ledsOn:
 			self.currentThread = threading.Thread(target=self.turnOffLeds)
@@ -45,25 +39,25 @@ class LedStripController():
 	def turnOnLeds(self):
 		self.ledsOn = True
 		self.togglingLeds = True
-		self.setAllLeds(self.maxIntensity)
+		self.setAllLeds(self.maxIntensity, self.maxIntensity, self.maxIntensity)
 		self.togglingLeds = False
 
 	def turnOffLeds(self):
 		self.ledsOn = False
 		self.togglingLeds = True
-		self.setAllLeds(0)
+		self.setAllLeds(0, 0, 0)
 		self.togglingLeds = False
 
-	def setAllLeds(self, finalValue):
+	def setAllLeds(self, finalR, finalG, finalB):
 		initialValues = copy.deepcopy(self.ledValues)
 
 		for step in range(1, self.TRANSITION_STEPS + 1):
 			startTime = time.time()
 
 			for led in range(self.ledCount) :
-				r = self.getPixelColorVal(initialValues[led][0], step, finalValue)
-				g = self.getPixelColorVal(initialValues[led][1], step, finalValue)
-				b = self.getPixelColorVal(initialValues[led][2], step, finalValue)
+				r = self.getPixelColorVal(initialValues[led][0], step, finalR)
+				g = self.getPixelColorVal(initialValues[led][1], step, finalG)
+				b = self.getPixelColorVal(initialValues[led][2], step, finalB)
 
 				self.setLedValue(led, r, g, b)
 
@@ -75,6 +69,14 @@ class LedStripController():
 			#going to need to take into consideration the run time so that we can get as close to TRANSITION_TIME as possible
 			sleepTime = self.TRANSITION_STEP_TIME - (time.time() - startTime)
 			time.sleep(sleepTime if sleepTime > 0 else 0)
+
+	def setAllLedsNow(self, r, g, b):
+		self.stopThreads()
+		
+		for led in range(self.ledCount) :
+			self.setLedValue(led, r, g, b)
+
+		self.strip.show()
 
 	def resetAll(self):
 		for led in range(self.ledCount):
@@ -100,3 +102,12 @@ class LedStripController():
 
 	def getPixelColorVal(self, initialValue, currentStep, finalValue):
 		return int(round(initialValue + ((finalValue - initialValue) / float(self.TRANSITION_STEPS)) * currentStep))
+
+	def stopThreads(self):
+		if hasattr(self, "currentThread") and self.currentThread.isAlive():
+			self.interruptToggle = True
+
+			while self.currentThread.isAlive():
+				time.sleep(0.05)
+
+			self.interruptToggle = False

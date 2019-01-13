@@ -28,10 +28,14 @@ class DisplayController():
 	def turnOffDisplay(self):
 		self.setDisplayPower(False)
 
-	def resetDisplayTimeout(self):
+	def clearDisplayTimeout(self):
 		if hasattr(self, "timeoutThread") and not self.timeoutThread.finished.isSet():
 			self.timeoutThread.cancel()
 
+	def resetDisplayTimeout(self):
+		self.clearDisplayTimeout()
+
 		if self.displayPower:
 			self.timeoutThread = Timer(self.DISPLAY_TIMEOUT_TIME, self.turnOffDisplay)
+			self.timeoutThread.daemon = True
 			self.timeoutThread.start()

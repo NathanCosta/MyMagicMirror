@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 
 import time
-from neopixel import *
+import socket
+import select
 import RPi.GPIO as GPIO
+import threading
+from neopixel import *
 from classes.LedStripController import LedStripController
 from classes.DisplayController import DisplayController
 
@@ -21,12 +24,19 @@ PIR_SENSOR_PIN	= 16
 BUTTON_ONE_PIN	= 12
 BUTTON_TWO_PIN	= 6
 
+#network configuration
+UDP_IP = "127.0.0.1"
+UDP_PORT = 12123 
+
 #tunning response times (in seconds)
 BUTTON_DOWN_TIME = 0.5
 
 #tracking variables, nothing to see here, move along
 BUTTON_ONE_LAST = 0.0
 BUTTON_TWO_LAST = 0.0
+
+#used to interrupt the program
+RUN_PROGRAM = True
 
 GPIO.setwarnings(True)
 GPIO.setmode(GPIO.BCM)
@@ -40,6 +50,9 @@ strip.begin()
 
 ledStripController = LedStripController(strip, LED_COUNT, MAX_INTENSITY)
 displayController = DisplayController()
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sock.bind((UDP_IP, UDP_PORT))
 
 def handleButtonOne():
 	global BUTTON_ONE_LAST
@@ -58,10 +71,22 @@ def handleButtonTwo():
 def handlePirSensor():
 	displayController.turnOnDisplay()
 
-if __name__ == '__main__':
-	ledStripController.resetAll()
+def listenToUDP():
+	global RUN_PROGRAM
 
-	while True:
+	while RUN_PROGRAM:
+		ready = select.select([sock], [], [], 1)
+		if ready[0]:
+			data, addr = sock.recvfrom(1024) # buffer size is 1024 bytes
+			colors = data.split(",")
+			ledStripController.setAllLedsNow(int(colors[0]), int(colors[1]), int(colors[2]))
+
+		time.sleep(0.05)
+
+def listenToGPIO():
+	global RUN_PROGRAM, BUTTON_ONE_PIN, BUTTON_TWO_PIN, PIR_SENSOR_PIN
+
+	while RUN_PROGRAM:
 
 		if(GPIO.input(BUTTON_ONE_PIN)):
 			handleButtonOne()
@@ -73,3 +98,32 @@ if __name__ == '__main__':
 			handlePirSensor()
 
 		time.sleep(0.05)
+
+if __name__ == '__main__':
+	ledStripController.resetAll()
+
+	run_event = threading.Event()
+	run_event.set()
+
+	udpThread = threading.Thread(target=listenToUDP)
+	gpioThread = threading.Thread(target=listenToGPIO)
+
+	udpThread.start()
+	gpioThread.start()
+
+	try:
+		#keep the main thread alive
+		while RUN_PROGRAM:
+			time.sleep(0.5)
+
+	except KeyboardInterrupt:
+		RUN_PROGRAM = False
+
+		run_event.clear()
+		udpThread.join()
+		gpioThread.join()
+
+		ledStripController.resetAll()
+		displayController.clearDisplayTimeout()
+		displayController.turnOnDisplay()
+		sock.close()
