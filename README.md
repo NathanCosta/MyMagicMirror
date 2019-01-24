@@ -17,3 +17,5 @@
 - Buttons: https://www.e-sonic.com/product-detail/mode/444811.html?p=45319622
 - Red Oak: https://www.homedepot.ca/en/home/p.1x5x8-feet-red-oak-s4s.1000151285.html
 - 2-way Acrylic Panel: https://www.amazon.ca/gp/product/B01N05S3BC
+- Breadboard: https://www.amazon.ca/Breadboard-Solderless-Prototype-PCB-Board/dp/B07589R1Q3
+- Several jumper wires to connect everything, soldering tools, and an infinite supply of wood working tools, knowledge and help from nearby family members :)
