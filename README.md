@@ -18,4 +18,6 @@
 - Red Oak: https://www.homedepot.ca/en/home/p.1x5x8-feet-red-oak-s4s.1000151285.html
 - 2-way Acrylic Panel: https://www.amazon.ca/gp/product/B01N05S3BC
 - Breadboard: https://www.amazon.ca/Breadboard-Solderless-Prototype-PCB-Board/dp/B07589R1Q3
+- LED Channels and diffusers: http://www.leevalley.com/en/wood/page.aspx?p=71702&cat=1,43349
 - Several jumper wires to connect everything, soldering tools, and an infinite supply of wood working tools, knowledge and help from nearby family members :)
+- Oh! and hooks! gotta get that mirror on the wall somehow...
