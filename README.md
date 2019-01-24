@@ -1,12 +1,12 @@
 # MyMagicMirror
 
-##To set up the Raspberry pi
+## To set up the Raspberry pi
 Magic Mirror: https://forum.magicmirror.builders/topic/236/complete-setup-tutorial/3
 Facial Recognition: https://github.com/normyx/MMM-Facial-Recognition-OCV3
 Lamp Stack: https://www.digitalocean.com/community/tutorials/how-to-install-linux-apache-mysql-php-lamp-stack-on-ubuntu-16-04
 Ratchet Socket Server: http://socketo.me/docs/install
 
-##Hardware
+## Hardware
 Raspberry Pi 3 B+: https://www.amazon.ca/RS-Components-Raspberry-Model-Motherboard/dp/B07BFH96M3
 Monitor: https://www.amazon.ca/gp/product/B0148NNKTC
 WS2812B Individually Addressable LED Strip: https://www.amazon.ca/gp/product/B06XNJSKXN
