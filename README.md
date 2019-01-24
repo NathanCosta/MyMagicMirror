@@ -10,6 +10,7 @@
 - Raspberry Pi 3 B+: https://www.amazon.ca/RS-Components-Raspberry-Model-Motherboard/dp/B07BFH96M3
 - Monitor: https://www.amazon.ca/gp/product/B0148NNKTC
 - WS2812B Individually Addressable LED Strip: https://www.amazon.ca/gp/product/B06XNJSKXN
+- Logitech C920 Webcam: https://www.amazon.ca/Logitech-C920-Webcam-Pro-960-000764/dp/B006JH8T3S
 - 5v 12a Power Supply: https://www.amazon.ca/gp/product/B074YHN8D1
 - 3.3v - 5v Phase Shifter: https://www.amazon.ca/gp/product/B07DS5D6KS
 - PIR Sensor: https://www.digikey.ca/short/ptzr0z
