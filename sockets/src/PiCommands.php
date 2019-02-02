@@ -10,11 +10,9 @@ class PiCommands implements MessageComponentInterface {
         $this->clients = new \SplObjectStorage;
     }
 
-    public function onOpen(ConnectionInterface $conn) {
-        // Store the new connection to send messages to later
+    public function onOpen(ConnectionInterface $conn)
+    {
         $this->clients->attach($conn);
-
-        echo "New connection! ({$conn->resourceId})\n";
     }
 
     public function onMessage(ConnectionInterface $from, $msg) {
@@ -23,30 +21,13 @@ class PiCommands implements MessageComponentInterface {
         echo sprintf('Connection %d sending message "%s" to %d other connection%s' . "\n"
             , $from->resourceId, $msg, $numRecv, $numRecv == 1 ? '' : 's');
             */
-        
-        $params = json_decode($msg, true);
 
-        if($params["command"] == "lightsOn")
-        {
-        	shell_exec('sudo python ~/LEDStrip/turnOnLights.py');
-        }
-        else if($params["command"] == "lightsOff")
-        {
-        	shell_exec('sudo python ~/LEDStrip/turnOffLights.py');
-        }
-        else if($params["command"] == "setLightsColor")
-        {
-        	list($r, $g, $b) = sscanf($params["color"], "#%02x%02x%02x");
-        	$ip = "127.0.0.1";
-			$port = 12123;
-			$str = "$r,$g,$b";
-
-			$sock = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP); 
-			socket_set_option($sock, SOL_SOCKET, SO_BROADCAST, 1);
-			socket_set_option($sock, SOL_SOCKET, SO_RCVTIMEO, array("sec"=>5, "usec"=>0));
-			socket_sendto($sock, $str, strlen($str), 0, $ip, $port);
-        	//exec("sudo python ~/LEDStrip/setLightsColor.py $r $g $b");
-        }
+        $ip = "127.0.0.1";
+        $port = 12123;
+        $sock = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP); 
+        socket_set_option($sock, SOL_SOCKET, SO_BROADCAST, 1);
+        socket_set_option($sock, SOL_SOCKET, SO_RCVTIMEO, array("sec"=>5, "usec"=>0));
+        socket_sendto($sock, $msg, strlen($msg), 0, $ip, $port);
 
         /*
         foreach ($this->clients as $client) {

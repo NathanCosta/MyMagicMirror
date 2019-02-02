@@ -10,8 +10,11 @@
 	</head>
 	<body>
 		<div id="color-picker-container"></div>
-		<input type="button" id="lightsOn" value="Lights On" />
-		<input type="button" id="lightsOff" value="Lights Off" />
+		<label>
+			User: <input type="text" name="user" id="user" />
+		</label>
+		<input type="button" id="capture" value="Capture" />
+		
 
 		<script type="text/javascript">
 			var conn = new WebSocket('ws://<?= $_SERVER['SERVER_ADDR'] ?>:8080');
@@ -26,15 +29,11 @@
 				send("setLightsColor", {color : color.hexString});
 			});
 
-			$("#lightsOn").on("click", function(){
-				send("lightsOn");
+			$("#capture").click(function(){
+				var user = $("#user").val();
+				if(user && user.trim())
+					send("capture", {user : user});
 			});
-
-			$("#lightsOff").on("click", function(){
-				send("lightsOff");
-			});
-
-			
 
 			conn.onopen = function(e) {
 			    console.log("Connection established!");
